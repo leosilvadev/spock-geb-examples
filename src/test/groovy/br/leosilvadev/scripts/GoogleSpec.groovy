@@ -7,7 +7,7 @@ import org.openqa.selenium.firefox.FirefoxDriver
 
 class GoogleSpec extends GebSpec {
 
-	def "Should find for Groovy in Google"(){
+	def "Should find for Groovy"(){
 		given:
 		def url = 'http://google.de'
 		
