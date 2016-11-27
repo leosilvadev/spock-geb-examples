@@ -1,3 +1,5 @@
+import org.apache.tools.ant.taskdefs.condition.Os
+
 apply from: "gradle/drivers.gradle"
 
 task chromeTest(type: Test) {
@@ -11,8 +13,7 @@ task chromeTest(type: Test) {
 	outputs.upToDateWhen { false }
 
 	systemProperty "geb.build.reportsDir", reporting.file("chrome/geb")
-	systemProperty "geb.env", "test"
-	systemProperty "geb.driver", "chrome"
+	systemProperty "geb.env", "chrome"
 	systemProperty "webdriver.chrome.driver", "$installChromeDriver.outputs.files.singleFile/chromedriver"
 }
 
@@ -25,10 +26,26 @@ task firefoxTest(type: Test) {
 	outputs.upToDateWhen { false }
 
 	systemProperty "geb.build.reportsDir", reporting.file("firefox/geb")
-	systemProperty "geb.env", "test"
-	systemProperty "geb.driver", "firefox"
+	systemProperty "geb.env", "firefox"
+}
+
+task phantomJsTest(type: Test) {
+	dependsOn installPhantomJsDriver
+	
+	reports {
+		html.destination = reporting.file("tests/html/e2e/phantonjs")
+		junitXml.destination = reporting.file("tests/xml/e2e/phantonjs")
+	}
+
+	outputs.upToDateWhen { false }
+
+	def phantomJsFilename = Os.isFamily(Os.FAMILY_WINDOWS) ? "phantomjs.exe" : "bin/phantomjs"
+	
+	systemProperty "geb.build.reportsDir", reporting.file("phantomjs/geb")
+	systemProperty "geb.env", "phantomJs"
+	systemProperty "phantomjs.binary.path", new File(installPhantomJsDriver.outputs.files.singleFile, phantomJsFilename).absolutePath
 }
 
 task e2eTest {
-	dependsOn chromeTest, firefoxTest
+	dependsOn chromeTest, firefoxTest, phantomJsTest
 }

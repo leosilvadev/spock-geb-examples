@@ -2,11 +2,18 @@ import org.apache.tools.ant.taskdefs.condition.Os
 import org.apache.commons.io.FileUtils
 
 buildscript {
-	repositories {
-		jcenter()
-	}
-	dependencies {
-		classpath "commons-io:commons-io:2.4"
+	repositories { jcenter() }
+	dependencies { classpath "commons-io:commons-io:2.4" }
+}
+
+def osInfo(returnAlias = true) {
+	if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+		return returnAlias ? "win32" : "windows.zip"
+	} else if (Os.isFamily(Os.FAMILY_MAC)) {
+		return returnAlias ? "mac32" : "macosx.zip"
+	} else if (Os.isFamily(Os.FAMILY_UNIX)) {
+		return returnAlias ?
+			(Os.isArch("amd64") ? "linux64" : "linux32") : (Os.isArch("amd64") ? "linux-x86_64.tar.bz2" : "linux-i686.tar.bz2")
 	}
 }
 
@@ -17,27 +24,51 @@ task downloadChromeDriver {
 	def outputFile = file("$buildDir/webdrivers/download/chromedriver.zip")
 	inputs.property("chromeDriverVersion", chromeDriverVersion)
 	outputs.file(outputFile)
-	
+
 	doLast {
-		def driverOsFilenamePart
-		if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-			driverOsFilenamePart = "win32"
-		} else if (Os.isFamily(Os.FAMILY_MAC)) {
-			driverOsFilenamePart = "mac32"
-		} else if (Os.isFamily(Os.FAMILY_UNIX)) {
-			driverOsFilenamePart = Os.isArch("amd64") ? "linux64" : "linux32"
-		}
-		FileUtils.copyURLToFile(new URL("http://chromedriver.storage.googleapis.com/${chromeDriverVersion}/chromedriver_${driverOsFilenamePart}.zip"), outputFile)
+		FileUtils.copyURLToFile(new URL("http://chromedriver.storage.googleapis.com/${chromeDriverVersion}/chromedriver_${osInfo()}.zip"), outputFile)
 	}
 }
 task installChromeDriver(type: Copy) {
-	def outputDir = file("$buildDir/webdrivers")
+	def outputDir = file("$buildDir/webdrivers/chromedriver")
 	dependsOn downloadChromeDriver
 	outputs.dir(outputDir)
 
-	println installChromeDriver.outputs.files.singleFile
 	from(zipTree(downloadChromeDriver.outputs.files.singleFile))
 	into(outputDir)
+}
+/*
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ */
+
+
+
+/*
+ * PhantomJS * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ */
+task downloadPhantomJsDriver {
+	def filename = "phantomjs-$phantomJsVersion-${osInfo(false)}"
+	def outputFile = file("$buildDir/webdrivers/download/$filename")
+	inputs.property("phantomJsVersion", phantomJsVersion)
+	outputs.file(outputFile)
+
+	doLast {
+		FileUtils.copyURLToFile(new URL("https://bitbucket.org/ariya/phantomjs/downloads/$filename"), outputFile)
+	}
+}
+
+task installPhantomJsDriver(type: Copy) {
+	def outputDir = file("$buildDir/webdrivers/phantomjs")
+	dependsOn downloadPhantomJsDriver
+	outputs.dir(outputDir)
+
+	def archive = downloadPhantomJsDriver.outputs.files.singleFile
+
+	from(Os.isFamily(Os.FAMILY_MAC) || Os.isFamily(Os.FAMILY_WINDOWS) ? zipTree(archive) : tarTree(archive))
+	into(outputDir)
+	eachFile { FileCopyDetails fcp ->
+		fcp.relativePath = new RelativePath(!fcp.directory, *fcp.relativePath.segments[1..-1])
+	}
 }
 /*
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
