@@ -14,6 +14,7 @@ class FormSpec extends GebReportingSpec {
 
 	def "Should fill and send the form"(){
 		given:
+		def nowDate = new Date().format('dd.MM.yyyy')
 		def url = 'http://www.abodeqa.com/wp-content/uploads/2016/05/DemoSite.html'
 		
 		when:
@@ -27,48 +28,78 @@ class FormSpec extends GebReportingSpec {
 		form.firstname = 'Leonardo'
 		report 'First name entered'
 		
-		and:
+		then:
+		form.firstname == 'Leonardo'
+		
+		when:
 		form.lastname = 'Silva'
 		report 'Last name entered'
 		
-		and:
+		then:
+		form.lastname == 'Silva'
+		
+		when:
 		form.sex = 'Male'
 		report 'Sex entered'
 		
-		and:
+		then:
+		form.sex == 'Male'
+		
+		when:
 		form.exp = 7
 		report 'Experience entered'
 		
-		and:
-		$('#datepicker') << new Date().format('dd.MM.yyyy')
+		then:
+		form.exp == '7'
+		
+		when:
+		$('#datepicker') << nowDate
 		report 'Date entered'
 		
-		and:
+		then:
+		$('#datepicker').value() == nowDate
+		
+		when:
 		$('#profession-0').click()
 		$('#profession-1').click()
 		report 'Professions selected'
 		
-		and:
+		then:
+		form.profession == ['Manual Tester', 'Automation Tester']
+		
+		when:
 		form.photo = file.absolutePath
 		report 'Photo selected'
 		
-		and:
+		then:
+		form.photo == 'temp.json'
+		
+		when:
 		$('#tool-1').click()
 		$('#tool-2').click()
 		report 'Tools selected'
 		
-		and:
+		then:
+		form.tool == [false, 'Selenium IDE', 'Selenium Webdriver']
+		
+		when:
 		form.continents = 'South America'
 		report 'Continent selected'
 		
-		and:
+		then:
+		form.continents =='South America'
+		
+		when:
 		form.selenium_commands = ['Browser Commands', 'Switch Commands']
 		report 'Commands selected'
 		
-		and:
+		then:
+		form.selenium_commands == ['Browser Commands', 'Switch Commands']
+		
+		when:
 		$('#submit').click()
 		
 		then:
-		true
+		$('input[name=firstname]').value() == ''
 	}
 }
