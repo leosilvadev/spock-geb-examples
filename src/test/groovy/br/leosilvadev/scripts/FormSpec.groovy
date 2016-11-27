@@ -1,10 +1,10 @@
 package br.leosilvadev.scripts
 
 import geb.Browser
-import geb.spock.GebSpec
-import spock.lang.Shared;
+import geb.spock.GebReportingSpec
+import spock.lang.Shared
 
-class FormSpec extends GebSpec {
+class FormSpec extends GebReportingSpec {
 	
 	@Shared def file
 	
@@ -21,38 +21,49 @@ class FormSpec extends GebSpec {
 		
 		then:
 		def form = $("form")
+		report 'Clean form'
 		
 		when:
 		form.firstname = 'Leonardo'
+		report 'First name entered'
 		
 		and:
 		form.lastname = 'Silva'
+		report 'Last name entered'
 		
 		and:
 		form.sex = 'Male'
+		report 'Sex entered'
 		
 		and:
 		form.exp = 7
+		report 'Experience entered'
 		
 		and:
 		$('#datepicker') << new Date().format('dd.MM.yyyy')
+		report 'Date entered'
 		
 		and:
 		$('#profession-0').click()
 		$('#profession-1').click()
+		report 'Professions selected'
 		
 		and:
 		form.photo = file.absolutePath
+		report 'Photo selected'
 		
 		and:
 		$('#tool-1').click()
 		$('#tool-2').click()
+		report 'Tools selected'
 		
 		and:
 		form.continents = 'South America'
+		report 'Continent selected'
 		
 		and:
 		form.selenium_commands = ['Browser Commands', 'Switch Commands']
+		report 'Commands selected'
 		
 		and:
 		$('#submit').click()
