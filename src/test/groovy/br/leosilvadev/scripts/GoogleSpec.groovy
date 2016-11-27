@@ -5,13 +5,8 @@ import geb.spock.GebSpec
 
 import org.openqa.selenium.firefox.FirefoxDriver
 
-class GoogleFirefoxSpec extends GebSpec {
+class GoogleSpec extends GebSpec {
 
-	def setupSpec() {
-		System.properties.put('geb.env', 'test')
-		System.properties.put('geb.driver', 'firefox')
-	}
-	
 	def "Should find for Groovy in Google"(){
 		given:
 		def url = 'http://google.de'
@@ -20,7 +15,7 @@ class GoogleFirefoxSpec extends GebSpec {
 		browser.go url
 		
 		and:
-		$('input[type=text]').value 'Groovy'
+		$('input[type=text]') << 'Groovy'
 		
 		and:
 		$('button[type=submit]').click()
@@ -31,6 +26,6 @@ class GoogleFirefoxSpec extends GebSpec {
 		}
 		
 		then:
-		$('h3>a').first().text().contains 'Groovy'
+		$('h3 > a').first().text().contains 'Groovy'
 	}
 }

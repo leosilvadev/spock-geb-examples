@@ -5,6 +5,8 @@ plugins {
 	id 'application'
 }
 
+apply from: "gradle/e2e.gradle"
+
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
@@ -30,10 +32,6 @@ dependencies {
 	compile group: 'org.seleniumhq.selenium', name: 'selenium-firefox-driver', version: '2.53.1'
 	compile group: 'org.seleniumhq.selenium', name: 'selenium-chrome-driver', version: '2.53.1'
 	compile group: 'org.seleniumhq.selenium', name: 'selenium-support', version: '2.53.1'
-}
-
-test {
-    systemProperties 'property': 'value'
 }
 
 sourceSets.main.java.srcDirs = ["src/main/java"]

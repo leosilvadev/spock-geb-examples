@@ -1,0 +1,34 @@
+apply from: "gradle/drivers.gradle"
+
+task chromeTest(type: Test) {
+	dependsOn installChromeDriver
+	
+	reports {
+		html.destination = reporting.file("tests/html/e2e/chrome")
+		junitXml.destination = reporting.file("tests/xml/e2e/chrome")
+	}
+
+	outputs.upToDateWhen { false }
+
+	systemProperty "geb.build.reportsDir", reporting.file("chrome/geb")
+	systemProperty "geb.env", "test"
+	systemProperty "geb.driver", "chrome"
+	systemProperty "webdriver.chrome.driver", "$installChromeDriver.outputs.files.singleFile/chromedriver"
+}
+
+task firefoxTest(type: Test) {
+	reports {
+		html.destination = reporting.file("tests/html/e2e/firefox")
+		junitXml.destination = reporting.file("tests/xml/e2e/firefox")
+	}
+
+	outputs.upToDateWhen { false }
+
+	systemProperty "geb.build.reportsDir", reporting.file("firefox/geb")
+	systemProperty "geb.env", "test"
+	systemProperty "geb.driver", "firefox"
+}
+
+task e2eTest {
+	dependsOn chromeTest, firefoxTest
+}
