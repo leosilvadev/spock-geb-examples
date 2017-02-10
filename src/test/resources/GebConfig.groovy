@@ -1,3 +1,5 @@
+import org.openqa.selenium.chrome.ChromeDriver
+import org.openqa.selenium.firefox.FirefoxDriver
 import org.openqa.selenium.phantomjs.PhantomJSDriver
 
 waiting {
@@ -9,6 +11,14 @@ waiting {
 environments {
 	phantomJs {
 		driver = { new PhantomJSDriver() }
+	}
+
+	firefox {
+		driver = { new FirefoxDriver() }
+	}
+
+	chrome {
+		driver = { new ChromeDriver() }
 	}
 }
 

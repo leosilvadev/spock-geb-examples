@@ -1,6 +1,5 @@
 package br.leosilvadev.scripts
 
-import geb.Browser
 import geb.spock.GebReportingSpec
 import spock.lang.Shared
 
@@ -14,8 +13,9 @@ class FormSpec extends GebReportingSpec {
 
 	def "Should fill and send the form"(){
 		given:
+		def p = System.getProperty('geb.domain')
 		def nowDate = new Date().format('dd.MM.yyyy')
-		def url = 'http://www.abodeqa.com/wp-content/uploads/2016/05/DemoSite.html'
+		def url = 'http://www.abodeqa.com/wp-content/uploads/2016/05/DemoSite.html?a='+p
 		
 		when:
 		browser.go url

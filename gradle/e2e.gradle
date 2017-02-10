@@ -2,50 +2,34 @@ import org.apache.tools.ant.taskdefs.condition.Os
 
 apply from: "gradle/drivers.gradle"
 
-task chromeTest(type: Test) {
-	dependsOn installChromeDriver
-	
-	reports {
-		html.destination = reporting.file("tests/html/e2e/chrome")
-		junitXml.destination = reporting.file("tests/xml/e2e/chrome")
-	}
+def domains = ['de', 'com']
+def browsers = ['chrome', 'firefox', 'phantomJs']
 
-	outputs.upToDateWhen { false }
+browsers.each { browser ->
+    domains.each { domain ->
+        def name = "${browser}${domain.capitalize()}"
+        task "${browser}Test${domain.capitalize()}"(type: Test) {
+            reports {
+                html.destination = reporting.file("$name/tests")
+                junitXml.destination = file("$buildDir/test-results/$name")
+            }
 
-	systemProperty "geb.build.reportsDir", reporting.file("chrome/geb")
-	systemProperty "geb.env", "chrome"
-	systemProperty "webdriver.chrome.driver", "$installChromeDriver.outputs.files.singleFile/chromedriver"
-}
+            outputs.upToDateWhen { false }
 
-task firefoxTest(type: Test) {
-	reports {
-		html.destination = reporting.file("tests/html/e2e/firefox")
-		junitXml.destination = reporting.file("tests/xml/e2e/firefox")
-	}
+            systemProperty 'geb.domain', domain
+            systemProperty 'geb.build.reportsDir', reporting.file("$name/geb")
+            systemProperty 'geb.env', browser
 
-	outputs.upToDateWhen { false }
+            if (browser == 'chrome') {
+                dependsOn installChromeDriver
+                systemProperty "webdriver.chrome.driver", "$installChromeDriver.outputs.files.singleFile/chromedriver"
+            }
 
-	systemProperty "geb.build.reportsDir", reporting.file("firefox/geb")
-	systemProperty "geb.env", "firefox"
-}
-
-task phantomJsTest(type: Test) {
-	dependsOn installPhantomJsDriver
-	
-	reports {
-		html.destination = reporting.file("tests/html/e2e/phantonjs")
-		junitXml.destination = reporting.file("tests/xml/e2e/phantonjs")
-	}
-
-	outputs.upToDateWhen { false }
-
-	def phantomJsFilename = Os.isFamily(Os.FAMILY_WINDOWS) ? "phantomjs.exe" : "bin/phantomjs"
-	
-	systemProperty "geb.build.reportsDir", reporting.file("phantomjs/geb")
-	systemProperty "geb.env", "phantomJs"
-	systemProperty "phantomjs.binary.path", new File(installPhantomJsDriver.outputs.files.singleFile, phantomJsFilename).absolutePath
-}
-
-task e2eTest {
-	dependsOn chromeTest, firefoxTest, phantomJsTest
+            if (browser == 'phantomJs') {
+                def phantomJsFilename = Os.isFamily(Os.FAMILY_WINDOWS) ? "phantomjs.exe" : "bin/phantomjs"
+                dependsOn installPhantomJsDriver
+                systemProperty "phantomjs.binary.path", new File(installPhantomJsDriver.outputs.files.singleFile, phantomJsFilename).absolutePath
+            }
+        }
+    }
 }

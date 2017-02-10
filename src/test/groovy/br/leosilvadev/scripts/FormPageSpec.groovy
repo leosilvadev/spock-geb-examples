@@ -1,7 +1,6 @@
 package br.leosilvadev.scripts
 
-import br.leosilvadev.pages.FormPage;
-import geb.Browser
+import br.leosilvadev.pages.FormPage
 import geb.spock.GebReportingSpec
 import spock.lang.Shared
 

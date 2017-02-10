@@ -4,7 +4,12 @@ import geb.Page
 
 class FormPage extends Page {
 
-	static url = 'http://www.abodeqa.com/wp-content/uploads/2016/05/DemoSite.html'
+	static url
+
+	static {
+		def p = System.getProperty('geb.domain')
+		url = 'http://www.abodeqa.com/wp-content/uploads/2016/05/DemoSite.html?p='+p
+	}
 	
 	static at = {
 		$('#header-links-inner').displayed
