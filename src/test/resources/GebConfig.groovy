@@ -1,3 +1,4 @@
+import org.openqa.selenium.firefox.FirefoxDriver
 import org.openqa.selenium.phantomjs.PhantomJSDriver
 
 waiting {
@@ -7,9 +8,13 @@ waiting {
 }
 
 environments {
+	firefox {
+		driver = { new FirefoxDriver() }
+	}
 	phantomJs {
 		driver = { new PhantomJSDriver() }
 	}
 }
 
+reportsDir = 'target/geb-reports'
 baseUrl = "http://localhost:8080"
